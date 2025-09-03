@@ -1,0 +1,35 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; 
+}
+
+.main_content {   
+  flex: 1;        
+  margin: 0;    
+}
+
+.card {  
+  width: 100%;
+  height: 100px;
+  text-align: center;
+  padding: 10px;
+  margin: 0;      
+
+}
+.NoDetails{
+  margin:100px;
+  text-align: center;
+}
+
+.FetchItems{
+   text-align: center;
+  margin-left: 10px;
+}
+.BookDetails{
+  margin-top: 10px;
+   text-align: center;
+}
+.YourSearch{
+  text-align: center;
+}
