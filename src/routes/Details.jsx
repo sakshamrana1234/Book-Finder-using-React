@@ -1,60 +1,76 @@
+import { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { FaArrowLeft, FaBook, FaCalendarDays, FaCheck, FaGlobe, FaLanguage, FaUserPen } from "react-icons/fa6";
+
+const DetailCoverFallback=({book})=>(
+  <div className="fallback-cover cover-theme-ink large-fallback-cover">
+    <span className="cover-label">Book Finder</span>
+    <strong>{book.title || "Untitled book"}</strong>
+    <small>{book.author_name?.[0] || "Unknown author"}</small>
+  </div>
+)
 
 const Details = () => {
-  const bookMessage = useSelector((state) => state.books.chosenOne);
-  const books = useSelector((state) => state.books.books);
-  console.log(" bookMessage value:", bookMessage, "type:", typeof bookMessage);
+  const selectedBook = useSelector((state) => state.books.chosenOne);
+  const [imageFailed,setImageFailed]=useState(false);
 
-  let BooksFiltered = [];
-  if (typeof bookMessage === "string" && bookMessage.trim() !== "") {
-    BooksFiltered = books.filter(
-      (book) => book.title?.toLowerCase() === bookMessage.toLowerCase()
-    );
-  }
-  if (BooksFiltered.length === 0) {
+  if (!selectedBook) {
     return (
-      <p className="NoDetails">
-        <strong>NO details found for this book.</strong>
-      </p>
+      <section className="empty-details">
+        <FaBook />
+        <h2>No book selected yet.</h2>
+        <p>Choose a book from the search results to see its full details.</p>
+        <Link to="/" className="back-link"><FaArrowLeft /> Back to search</Link>
+      </section>
     );
   }
+
+  const authors=selectedBook.author_name?.join(", ") || "Unknown author";
+  const languages=selectedBook.language?.slice(0,8).join(", ").toUpperCase() || "Language unavailable";
+
   return (
-    <div className="BookDetails">
-      <h2 className="TopMessage">It's good to see you have found your book</h2>
-      <p>
-        <strong>Title: </strong>
-        {BooksFiltered[0].title}
-      </p>
-      <p>
-        <strong>Author: </strong>
-        {BooksFiltered[0].author_name?.join(",")}
-      </p>
-      <p>
-        <strong>First Published: </strong>
-        {BooksFiltered[0].first_publish_year}
-      </p>
-  
-      <p>
-        <strong>Language: </strong>
-        {BooksFiltered[0].language?.join(",")}
-      </p>
-      <p>
-        <strong>Ebook Access: </strong>
-        {BooksFiltered[0].ebook_access}
-      </p>
-      <p>
-        <strong>EditionCount: </strong>
-        {BooksFiltered[0].edition_count}
-      </p>
-      <p>
-        <strong>Has Fulltext: </strong>
-        {BooksFiltered[0].has_fulltext ? "True" : "False"}
-      </p>
-      <p>
-        <strong>Work key: </strong>
-        {BooksFiltered[0].key}
-      </p>
-    </div>
+    <section className="details-page">
+      <Link to="/" className="back-link"><FaArrowLeft /> Back to results</Link>
+      <div className="details-layout">
+        <div className="details-cover">
+          {selectedBook.cover_i && !imageFailed ? (
+            <img src={`https://covers.openlibrary.org/b/id/${selectedBook.cover_i}-L.jpg`} alt={`${selectedBook.title} cover`} onError={()=>setImageFailed(true)} />
+          ) : (
+            <DetailCoverFallback book={selectedBook} />
+          )}
+        </div>
+        <div className="details-content">
+          <span className="details-eyebrow">Selected book</span>
+          <h1>{selectedBook.title}</h1>
+          <div className="details-meta">
+            <p><FaUserPen /> {authors}</p>
+            <p><FaCalendarDays /> First published {selectedBook.first_publish_year || "year unavailable"}</p>
+            <p><FaLanguage /> {languages}</p>
+            <p><FaCheck /> {selectedBook.has_fulltext ? "Full text available" : "Full text not listed"}</p>
+          </div>
+          <div className="detail-stats">
+            <div>
+              <span>{selectedBook.edition_count || 0}</span>
+              <p>Editions</p>
+            </div>
+            <div>
+              <span>{selectedBook.ebook_access || "Unknown"}</span>
+              <p>Ebook access</p>
+            </div>
+            <div>
+              <span>{selectedBook.key || "Unavailable"}</span>
+              <p>Work key</p>
+            </div>
+          </div>
+          {selectedBook.key && (
+            <a className="open-library-link" href={`https://openlibrary.org${selectedBook.key}`} target="_blank" rel="noreferrer">
+              <FaGlobe /> View on Open Library
+            </a>
+          )}
+        </div>
+      </div>
+    </section>
   );
 };
 export default Details;

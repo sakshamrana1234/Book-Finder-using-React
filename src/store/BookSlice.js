@@ -2,7 +2,7 @@ import { configureStore ,createSlice} from "@reduxjs/toolkit";
 const BookSlice=createSlice({
 name:"books",
 initialState:{
-   books:[],chosenOne:[]
+   books:[],chosenOne:null
 },
 reducers:{
   addInitialBooks:(state,action)=>{
